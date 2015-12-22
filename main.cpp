@@ -2,149 +2,108 @@
 #include<string.h>
 #include<conio.h>
 #include<cstdio>
-#include "Print.h"
 using namespace std;
 
-class Question//вопросы
-{
-private:
-	char *text;
-public:
-	void setText(char *buffer)
-	{
-		//cout << "buffer :" << buffer << endl;
-		text = buffer;
-	}
-	char* getText()
-	{
-		return text;
-	}
-	void Print()
-	{
-		cout << "Your Questions are : " << endl;
-		cout << text << endl;
-	}
-};
 
 
 class Test//test
 {
-private:
-	Question *Arr;//массив вопросов
-	int size = 0;
+protected:
+	char nazvanie_predmeta[100];
+	int kol_vo = 0;
 	int current = 0;
+	Test *next;
+	friend class Question;
 public:
+	virtual void printTitle() = 0;
+	virtual void Input(void) = 0;
 	Test()
 	{
 		cout << "Default constructor : Test " << endl;
+		next = 0;
+		strcpy(nazvanie_predmeta, "Without_name");
+		kol_vo = 0;
 	}
 	~Test()
 	{
 		cout << "Destructor : Test" << endl;
 	}
-	Test(int s)
+	Test(char *nazvanie_predmeta, int nomer_testa)
 	{
-		cout << "Constructor : Test " << endl;
-		size = s;
-		Arr = new Question[size];
-	}
-	void addQuestion(char *buffer)
-	{
-		if (current <= size)
-		{
-			Arr[current].setText(buffer);
-			current++;
-		}
-		else
-		{
-			cout << "ERROR" << endl;
-			abort();
-		}
-	}
-	void getquestion()
-	{
-		for (int i = 0; i < current; i++)
-			Arr[i].Print();
-	}
-	void setSize(int s)
-	{
-		size = s;
+		strcpy(this->nazvanie_predmeta, nazvanie_predmeta);
+		this->kol_vo = kol_vo;
+		next = 0;
 	}
 };
-class Exam : Test, public Printing
+class Question//вопросы
 {
 private:
-	int size = 0;
-	int current = 0;
-	Question* Mass;
+	Test* begin;
+public:
+	void Insert(Test *p)
+	{
+		Test *r;
+		r = begin;
+		begin = p;
+		p->next = r;
+	}
+	void printTitle()
+	{
+		Test *r;
+		r = begin;
+		while (r)
+		{
+			r->printTitle();
+			r = r->next;
+		}
+
+	}
+	~Question()
+	{
+		Test *r;
+		while (begin)
+		{
+			r = begin;
+			begin = begin->next;
+			delete r;
+		}
+	}
+};
+
+class Exam: public Test//экзамен
+{
+protected:
+	int srednee;
 public:
 	Exam()
 	{
 		cout << "Default constructor : Exam " << endl;
+		srednee = 0;
 	}
-	Exam(int s)
+	Exam(char*nazvanie_predmeta,int srednee,int kol_vo) : Test(nazvanie_predmeta,kol_vo)
 	{
 		cout << "Constructor : Exam" << endl;
-		size = s;
-		Mass = new Question[size];
+		this->srednee = srednee;
+
 	}
 	~Exam()
 	{
 		cout << "Destructor : Exam" << endl;
 	}
-	void addQuestionExam(char* buffer)
-	{
-		if (current <= size)
-		{
-			Mass[current].setText(buffer);
-			current++;
-		}
-		else
-		{
-			cout << "ERROR" << endl;
-			abort();
-		}
-	}
-	void getQuestionExam()
-	{
-		printTitle();
-		for (int i = 0; i < current; i++)
-			Mass[i].Print();
-	}
-	void setSize(int s)
-	{
-		size = s;
-	}
-};
-
-class Math:public Exam
-{
-public:
-	Math(int s) :Exam(s) {};
 	void printTitle()
 	{
-		cout << "Math exams: " << endl;
+		cout << "Название предмета = " << nazvanie_predmeta << " Количество вопросов = " << kol_vo << " Средняя оценка = " << srednee << endl;
 	}
-private:
-
-};
-
-
-class Fil:public Exam
-{
-public:
-	Fil(int s) :Exam(s) {};
-	void printTitle()
+	void Input()
 	{
-		cout << "Fil exams: " << endl;
+		cout << "Название предмета = ";
+		cin >> nazvanie_predmeta;
+		cout << " Количество вопросов = ";
+		cin >> kol_vo;
+		cout << " Средняя оценка = ";
+		cin >> srednee;
 	}
-
-private:
-
 };
-
-
-
 
 
 int main()
@@ -161,7 +120,7 @@ int main()
 	}
 	E.getQuestionExam();
 	cout << "----------" << endl;*/
-	Math mat(1);
+	/*Math mat(1);
 	for (int i = 0; i < 1; i++)
 	{
 		char* str2 = new char[250];
@@ -179,6 +138,14 @@ int main()
 	cout << "----------" << endl;
 	fil.getQuestionExam();
 	system("pause");
+	return 0;*/
+	setlocale(LC_CTYPE, "Russian");
+	Question qq;
+	Exam *ex;
+	ex = new Exam("Философия", 4, 60);
+	qq.Insert(ex);
+	ex = new Exam("Высшая математика",4,60);
+	qq.Insert(ex);
+	qq.printTitle();
 	return 0;
-
 }
